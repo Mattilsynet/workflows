@@ -1,0 +1,67 @@
+name: 'Build'
+
+on:
+  workflow_call:
+
+jobs:
+  build:
+    name: 'Build'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v1
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+
+      - name: Get ARTIFACT_NAME from repoistory name
+        run: echo "ARTIFACT_NAME=$(echo '${{ github.repository }}' | awk -F '/' '{print $2}')" >> $GITHUB_ENV
+        shell: bash
+
+      - name: Potentially get the tag
+        id: tagName
+        uses: little-core-labs/get-git-tag@v3.0.1
+        with:
+          tagRegexGroup: 1
+
+      - name: Conditional to set RELEASE to tag value
+        if: ${{ startsWith(steps.tagName.outputs.tag,'v') }}
+        run: echo "RELEASE=${{ steps.tagName.outputs.tag}}" >> $GITHUB_ENV
+
+      - name: Conditional to set RELEASE to tag to latest
+        if: ${{ !startsWith(steps.tagName.outputs.tag,'v') }}
+        run: echo "RELEASE=latest" >> $GITHUB_ENV
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v1
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Login to Google Artifact Registry
+        uses: docker/login-action@v1
+        with:
+          registry: europe-north1-docker.pkg.dev
+          username: _json_key
+          password: ${{ secrets.GAR_JSON_KEY }}
+
+      - name: Build
+        uses: crossplane-contrib/xpkg-action@v0.2.0
+        with:
+          channel: master
+          version: current
+          command: build configuration -f ./package --name=${{ env.ARTIFACT_NAME }}.xpkg
+
+      - name: Push Package to GitHub Container Registry
+        uses: crossplane-contrib/xpkg-action@v0.2.0
+        with:
+          command: push configuration -f ./package/${{ env.ARTIFACT_NAME}}.xpkg ghcr.io/mattilsynet/${{ env.ARTIFACT_NAME }}:${{ env.RELEASE }}
+
+      - name: Push Package to Google Artifact Registry
+        uses: crossplane-contrib/xpkg-action@v0.2.0
+        with:
+          command: push configuration -f ./package/${{ env.ARTIFACT_NAME }}.xpkg europe-north1-docker.pkg.dev/plattform-341615/mtdocker/${{ env.ARTIFACT_NAME }}:${{ env.RELEASE }}
