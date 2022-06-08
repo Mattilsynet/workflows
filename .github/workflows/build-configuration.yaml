@@ -64,4 +64,4 @@ jobs:
       - name: Push Package to Google Artifact Registry
         uses: crossplane-contrib/xpkg-action@v0.2.0
         with:
-          command: push configuration -f ./package/${{ env.ARTIFACT_NAME }}.xpkg europe-north1-docker.pkg.dev/plattform-341615/mtdocker/${{ env.ARTIFACT_NAME }}:${{ env.RELEASE }}
+          command: push configuration -f ./package/${{ env.ARTIFACT_NAME }}.xpkg europe-north1-docker.pkg.dev/artifacts-352708/mt-images/${{ env.ARTIFACT_NAME }}:${{ env.RELEASE }}
