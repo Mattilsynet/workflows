@@ -12,6 +12,9 @@ on:
       policy_namespace:
         required: true
         type: string
+      gh_token:
+        required: true
+        type: string
 env:
   CONFTEST_VERSION: 0.32.1
 
