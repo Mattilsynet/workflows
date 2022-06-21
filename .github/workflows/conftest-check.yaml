@@ -12,10 +12,6 @@ on:
       policy_namespace:
         required: true
         type: string
-      github_token:
-        required: true
-        type: string
-
 env:
   CONFTEST_VERSION: 0.32.1
 
@@ -32,7 +28,7 @@ jobs:
         with:
           repository: Mattilsynet/map-policies
           path: map-policies
-          token: ${{ inputs.github_token }}
+          token: ${{ github.token }} 
 
       - name: Show layout
         run: ls -al
