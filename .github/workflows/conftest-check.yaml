@@ -1,0 +1,39 @@
+name: 'Conftest'
+
+on:
+  workflow_call:
+    inputs:
+      path_to_check:
+        required: true
+        type: string
+      policy_path:
+        required: true
+        type: string
+
+env:
+  CONFTEST_VERSION: 0.32.1
+
+jobs:
+  build:
+    name: 'Build'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Checkout tools repo
+        uses: actions/checkout@v3
+        with:
+          repository: Mattilsynet/map-policies
+          path: map-policies
+
+      - name: Show layout
+        run: ls -al
+
+      - name: Install conftest
+        run: |
+          wget -O - 'https://github.com/open-policy-agent/conftest/releases/download/v${{ env.CONFTEST_VERSION }}/conftest_${{ env.CONFTEST_VERSION }}_Linux_x86_64.tar.gz' | tar zxvf -
+          ./conftest --version
+
+      - name: Conftest run
+        run: ./conftest test ${{ inputs.path_to_check }} -p ${{ inputs.policy_path }}
