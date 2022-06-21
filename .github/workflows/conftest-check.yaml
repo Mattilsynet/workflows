@@ -36,4 +36,4 @@ jobs:
           ./conftest --version
 
       - name: Conftest run
-        run: ./conftest test ${{ inputs.path_to_check }} -p ${{ inputs.policy_path }}
+        run: ./conftest test ${{ inputs.path_to_check }} -p ${{ inputs.policy_path }} -o table
