@@ -28,7 +28,7 @@ jobs:
         with:
           repository: Mattilsynet/map-policies
           path: map-policies
-          token: ${{ github.token }} 
+          token: ${{ secrets.token }}
 
       - name: Show layout
         run: ls -al
