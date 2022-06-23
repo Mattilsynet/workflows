@@ -33,4 +33,4 @@ jobs:
           ./conftest --version
 
       - name: Conftest run
-        run: ./conftest test ${{ inputs.paths_to_check }} -p map-policies/policies --all-namespaces -o table
+        run: ./conftest test ${{ inputs.paths_to_check }} -p map-policies/policies --all-namespaces -o github
