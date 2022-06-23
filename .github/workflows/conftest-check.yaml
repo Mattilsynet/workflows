@@ -6,6 +6,11 @@ on:
       paths_to_check:
         required: true
         type: string
+      namespaces:
+        description: "Supply namespaces if need run only specific ones"
+        required: false
+        default: "--all-namespaces" # or "-n <namespace1> -n <namespace2> ..."
+        type: string
 env:
   CONFTEST_VERSION: 0.32.1
 
@@ -33,4 +38,4 @@ jobs:
           ./conftest --version
 
       - name: Conftest run
-        run: ./conftest test ${{ inputs.paths_to_check }} -p map-policies/policies --all-namespaces -o github
+        run: ./conftest test ${{ inputs.paths_to_check }} -p map-policies/policies ${{ inputs.namespaces}} -o github
