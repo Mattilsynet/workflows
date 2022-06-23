@@ -3,7 +3,7 @@ name: 'Conftest'
 on:
   workflow_call:
     inputs:
-      path_to_check:
+      paths_to_check:
         required: true
         type: string
       policy_path:
@@ -36,4 +36,4 @@ jobs:
           ./conftest --version
 
       - name: Conftest run
-        run: ./conftest test ${{ inputs.path_to_check }} -p ${{ inputs.policy_path }} --all-namespaces -o table
+        run: ./conftest test ${{ inputs.paths_to_check }} -p ${{ inputs.policy_path }} --all-namespaces -o table
