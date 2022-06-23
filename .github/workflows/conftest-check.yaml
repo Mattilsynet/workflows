@@ -9,9 +9,6 @@ on:
       policy_path:
         required: true
         type: string
-      policy_namespace:
-        required: true
-        type: string
 env:
   CONFTEST_VERSION: 0.32.1
 
@@ -39,4 +36,4 @@ jobs:
           ./conftest --version
 
       - name: Conftest run
-        run: ./conftest test ${{ inputs.path_to_check }} -p ${{ inputs.policy_path }} -n ${{ inputs.policy_namespace }} -o table
+        run: ./conftest test ${{ inputs.path_to_check }} -p ${{ inputs.policy_path }} --all-namespaces -o table
