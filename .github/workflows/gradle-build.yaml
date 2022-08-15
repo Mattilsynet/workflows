@@ -1,0 +1,46 @@
+name: 'Publish gradle package'
+
+on:
+  workflow_call:
+    inputs:
+      publish_version:
+        description: The version of the package to publish
+        type: string
+        required: true
+      gradle_version:
+        description: The gradle version to use
+        type: string
+        required: true
+      java_version:
+        description: The java version to use
+        type: string
+        required: true
+
+jobs:
+  build:
+    name: 'Build'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-java@v3
+        with:
+          distribution: 'adopt'
+          java-version: ${{ inputs.java_version }}
+          cache: 'gradle'
+
+      - name: Setup Gradle
+        uses: gradle/gradle-build-action@v2
+        with:
+          gradle-version: ${{ inputs.gradle_version }}
+
+      - name: Execute Gradle publish
+        run: ./gradlew publish -Pversion=${{ inputs.publish_version }}
+        env:
+          GITHUB_ACTOR: ${{ env.GITHUB_ACTOR }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Show the built version number in the job run summary
+        run: echo "### Published artifact ${{ github.repository }} version ${{ inputs.publish_version }}" >> $GITHUB_STEP_SUMMARY
