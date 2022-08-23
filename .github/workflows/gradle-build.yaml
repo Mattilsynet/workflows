@@ -52,5 +52,5 @@ jobs:
         if: inputs.sonarcloud_project_id
         run: ./gradlew build sonarqube -Dsonar.organization=mattilsynet -Dsonar.host.url=https://sonarcloud.io -Dsonar.projectKey=${{ inputs.sonarcloud_project_id }}
         env:
-          #GITHUB_ACTOR: ${{ env.GITHUB_ACTOR }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
