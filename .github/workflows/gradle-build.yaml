@@ -41,15 +41,9 @@ jobs:
 
       - name: Execute gradle build
         run: ./gradlew build
-        env:
-          GITHUB_ACTOR: ${{ env.GITHUB_ACTOR }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Run tests
         run: ./gradlew test
-        env:
-          GITHUB_ACTOR: ${{ env.GITHUB_ACTOR }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Publish data to sonarcloud
         if: inputs.sonarcloud_project_id
