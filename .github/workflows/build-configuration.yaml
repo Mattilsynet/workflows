@@ -2,6 +2,12 @@ name: 'Build'
 
 on:
   workflow_call:
+    inputs:
+      gcp_ar_repo:
+        description: "Specify team specific artifact registry repository if need to"
+        type: string
+        required: false
+        default: "mt-images"
 
 jobs:
   build:
@@ -64,4 +70,4 @@ jobs:
       - name: Push Package to Google Artifact Registry
         uses: crossplane-contrib/xpkg-action@v0.2.0
         with:
-          command: push configuration -f ./package/${{ env.ARTIFACT_NAME }}.xpkg europe-north1-docker.pkg.dev/artifacts-352708/mt-images/${{ env.ARTIFACT_NAME }}:${{ env.RELEASE }}
+          command: push configuration -f ./package/${{ env.ARTIFACT_NAME }}.xpkg europe-north1-docker.pkg.dev/artifacts-352708/${{ inputs.gcp_ar_repo }}/${{ env.ARTIFACT_NAME }}:${{ env.RELEASE }}
