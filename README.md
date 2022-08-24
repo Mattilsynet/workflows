@@ -1,6 +1,6 @@
 # Reusable GitHub Action Workflows
 
-We provide a few workflows that you can use either directly with the `uses` directive, or use it inspiration for building your own.
+We provide a few workflows that you can use either directly with the `uses` directive, or use it as inspiration for building your own.
 
 Example usage with the `uses` directive:
 
