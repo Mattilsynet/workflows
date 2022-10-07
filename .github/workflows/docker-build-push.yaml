@@ -28,9 +28,6 @@ on:
         type: boolean
         default: false
         required: false
-    secrets:
-      GAR_JSON_KEY:
-        required: false
 
 jobs:
   build:
@@ -62,13 +59,24 @@ jobs:
           tags: |
             ghcr.io/${{ inputs.gh_image }}
 
-      - name: Login to Google Artifact Registry
+      - id: 'auth'
+        name: 'Authenticate to Google Cloud'
         if: ${{ inputs.push_to_gar }}
-        uses: docker/login-action@v1
+        uses: 'google-github-actions/auth@v0.3.1'
         with:
-          registry: europe-north1-docker.pkg.dev
-          username: _json_key
-          password: ${{ secrets.GAR_JSON_KEY }}
+          token_format: access_token
+          create_credentials_file: true
+          workload_identity_provider: projects/799884623953/locations/global/workloadIdentityPools/gh-actions/providers/github
+          service_account: artifacts-wi-sa-github-actions@artifacts-352708.iam.gserviceaccount.com
+
+      - id: docker_login
+        name: Login to GAR
+        if: ${{ inputs.push_to_gar }}
+        uses: 'docker/login-action@v1'
+        with:
+          registry: 'europe-north1-docker.pkg.dev' # or REGION-docker.pkg.dev
+          username: 'oauth2accesstoken'
+          password: '${{ steps.auth.outputs.access_token }}'
 
       - name: Build and push to GAR
         if: ${{ inputs.push_to_gar }}
