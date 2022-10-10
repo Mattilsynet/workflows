@@ -34,6 +34,7 @@ jobs:
     permissions:
       contents: 'read'
       id-token: 'write'
+      packages: 'write'
     name: 'Build'
     runs-on: ubuntu-20.04
     steps:
