@@ -41,7 +41,6 @@ jobs:
         env:
           GITHUB_ACTOR: ${{ env.GITHUB_ACTOR }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GITHUB_PAT: ${{ secrets.READ_SOURCE_AND_PACKAGES }}
 
       - name: Show the built version number in the job run summary
         run: echo "### Published artifact ${{ github.repository }} version ${{ inputs.publish_version }}" >> $GITHUB_STEP_SUMMARY
