@@ -41,13 +41,9 @@ jobs:
 
       - name: Execute gradle build
         run: ./gradlew build
-        env:
-          GITHUB_PAT: ${{ secrets.READ_SOURCE_AND_PACKAGES }}
 
       - name: Run tests
         run: ./gradlew test
-        env:
-          GITHUB_PAT: ${{ secrets.READ_SOURCE_AND_PACKAGES }}
 
       - name: Publish data to sonarcloud
         if: inputs.sonarcloud_project_id
