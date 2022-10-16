@@ -1,0 +1,91 @@
+name: 'Build, Tag and Publish gradle package'
+on:
+  workflow_call:
+    inputs:
+      is_pr:
+        description: Is the job for a pr branch or not
+        type: boolean
+        required: true
+      gradle_version:
+        description: The gradle version to use
+        type: string
+        required: true
+      java_version:
+        description: The java version to use
+        type: string
+        required: true
+jobs:
+  build-tag-publish-package:
+    runs-on: ubuntu-20.04
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        ref: ${{ github.event.pull_request.head.sha }}
+        fetch-depth: '0'
+    - uses: actions/setup-java@v3
+      with:
+        distribution: temurin
+        java-version: ${{ inputs.java_version }}
+    - name: Setup and execute Gradle 'build' task
+      id: build
+      uses: gradle/gradle-build-action@v2
+      env:
+        GITHUB_ACTOR: ${{ secrets.GITHUB_ACTOR }}
+        GITHUB_PAT: ${{ secrets.READ_SOURCE_AND_PACKAGES }}
+      with:
+        gradle-version: ${{ inputs.gradle_version }}
+        arguments: build -x test
+    - name: Execute Gradle 'test' task
+      id: test
+      uses: gradle/gradle-build-action@v2
+      env:
+        GITHUB_ACTOR: ${{ secrets.GITHUB_ACTOR }}
+        GITHUB_PAT: ${{ secrets.READ_SOURCE_AND_PACKAGES }}
+      with:
+        arguments: |
+          test
+          -Dtest.reports.junitXml.enabled=true
+    - name: Test Report
+      uses: dorny/test-reporter@v1
+      if: success() || failure()
+      with:
+        name: Junit Tests
+        path: build/test-results/test/TEST-*.xml
+        reporter: java-junit
+    - name: Execute Gradle 'publish snapshot' task
+      id: publish_snapshot
+      if: ${{ inputs.is_pr == true }}
+      uses: gradle/gradle-build-action@v2
+      env:
+        GITHUB_ACTOR: ${{ secrets.GITHUB_ACTOR }}
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        arguments:
+          snapshot
+          -Prelease.scope=patch
+          -x test
+          publish
+    - name: Bump version and push tag
+      id: bump_version
+      if: ${{ inputs.is_pr == false }}
+      uses: anothrNick/github-tag-action@v1
+      env:
+        DEFAULT_BUMP: minor
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        RELEASE_BRANCHES: master,main
+        WITH_V: true
+    - name: Execute Gradle 'publish' task
+      id: publish
+      if: ${{ inputs.is_pr == false }}
+      uses: gradle/gradle-build-action@v2
+      env:
+        GITHUB_ACTOR: ${{ secrets.GITHUB_ACTOR }}
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        arguments: |
+          publish
+          -x test
+          -Prelease.useLastTag=true
+    - name: Show the built version number in the job run summary
+      if: ${{ inputs.is_pr == false }}
+      run: echo "### Published artifact ${{ github.repository }} version ${{ steps.bump_version.outputs.tag }}" >> $GITHUB_STEP_SUMMARY
