@@ -17,6 +17,9 @@ on:
 jobs:
   build-tag-publish-package:
     runs-on: ubuntu-20.04
+    permissions:
+      checks: write
+      statuses: write
     steps:
     - uses: actions/checkout@v3
       with:
