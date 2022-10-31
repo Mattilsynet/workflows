@@ -1,3 +1,15 @@
+# DEPRECATED
+
+This repository is now deprecated. It was not possible to version the workflows if they are all in a shared repository, so we split them up:
+
+* [wf-docker-build-push](https://github.com/Mattilsynet/wf-docker-build-push)
+* [wf-gradle-build](https://github.com/Mattilsynet/wf-gradle-build)
+* [wf-gradle-publish](https://github.com/Mattilsynet/wf-gradle-publish)
+
+There is also a template repository that you can use, when you create a new workflow:
+
+* [wf-template](https://github.com/Mattilsynet/wf-template)
+
 # Reusable GitHub Action Workflows
 
 We provide a few workflows that you can use either directly with the `uses` directive, or use it as inspiration for building your own.
