@@ -17,6 +17,11 @@ on:
 jobs:
   build-tag-publish-package:
     runs-on: ubuntu-20.04
+    permissions:
+      pull-requests: write
+      checks: write
+      contents: write
+      packages: write
     steps:
     - uses: actions/checkout@v3
       with:
@@ -46,7 +51,7 @@ jobs:
           test
           -Dtest.reports.junitXml.enabled=true
     - name: Test Report
-      uses: dorny/test-reporter@v1
+      uses: dorny/test-reporter@v1.6.0
       if: success() || failure()
       with:
         name: Junit Tests
