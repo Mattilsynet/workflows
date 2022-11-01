@@ -24,6 +24,10 @@ on:
         type: boolean
         default: false
         required: false
+      sonarcloud_project_id:
+        description: The sonarcloud project key
+        type: string
+        required: false
 jobs:
   build-tag-publish-package:
     runs-on: ubuntu-20.04
@@ -56,7 +60,7 @@ jobs:
           sonarqube
           -Dsonar.organization=mattilsynet
           -Dsonar.host.url=https://sonarcloud.io
-          -Dsonar.projectKey=Mattilsynet_${{ github.repository }}      
+          -Dsonar.projectKey=${{ inputs.sonarcloud_project_id }}
     - name: Test Report
       uses: dorny/test-reporter@v1.6.0
       if: success() || failure()
