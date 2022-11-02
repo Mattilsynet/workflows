@@ -29,7 +29,7 @@ on:
         type: string
         required: false
 jobs:
-  setup:
+  build:
     runs-on: ubuntu-22.04
     permissions:
       pull-requests: write
@@ -45,10 +45,6 @@ jobs:
       with:
         distribution: temurin
         java-version: ${{ inputs.java_version }}
-  build:
-    needs: setup
-    runs-on: ubuntu-22.04
-    steps:   
     - name: Execute Gradle 'build' task
       id: build
       uses: gradle/gradle-build-action@v2
@@ -61,7 +57,7 @@ jobs:
         arguments: build -x test
   sonarcube:
     needs: build
-    if: inputs.sonarcloud_project_id
+    if: ${{ inputs.sonarcloud_project_id }}
     runs-on: ubuntu-22.04
     steps:   
     - name: Execute Gradle 'sonarcube' task
@@ -81,7 +77,20 @@ jobs:
   test:
     needs: build
     runs-on: ubuntu-22.04
-    steps: 
+    permissions:
+      pull-requests: write
+      checks: write
+      contents: write
+      packages: write
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        ref: ${{ github.event.pull_request.head.sha }}
+        fetch-depth: '0'
+    - uses: actions/setup-java@v3
+      with:
+        distribution: temurin
+        java-version: ${{ inputs.java_version }}
     - name: Execute Gradle 'test' task
       id: test
       uses: gradle/gradle-build-action@v2
@@ -104,7 +113,20 @@ jobs:
   dependency-check:
     needs: build
     runs-on: ubuntu-22.04
+    permissions:
+      pull-requests: write
+      checks: write
+      contents: write
+      packages: write
     steps:
+    - uses: actions/checkout@v3
+      with:
+        ref: ${{ github.event.pull_request.head.sha }}
+        fetch-depth: '0'
+    - uses: actions/setup-java@v3
+      with:
+        distribution: temurin
+        java-version: ${{ inputs.java_version }}
     - name: Depcheck
       uses: dependency-check/Dependency-Check_Action@main
       env: 
@@ -124,7 +146,7 @@ jobs:
           path: ${{github.workspace}}/reports
   publish:
     needs: test
-    if: inputs.push_to_gb
+    if: ${{ inputs.push_to_gb }}
     runs-on: ubuntu-22.04
     steps: 
     - name: Execute Gradle 'publish snapshot' task
