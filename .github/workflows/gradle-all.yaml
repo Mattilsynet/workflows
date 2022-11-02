@@ -30,7 +30,7 @@ on:
         required: false
 jobs:
   build-tag-publish-package:
-    runs-on: macos-latest
+    runs-on: ubuntu-20.04
     permissions:
       pull-requests: write
       checks: write
@@ -56,7 +56,7 @@ jobs:
         gradle-version: ${{ inputs.gradle_version }}
         arguments: |
           build
-          --debug
+          --scan
           -Dtest.reports.junitXml.enabled=true
           sonarqube
           -Dsonar.organization=mattilsynet
