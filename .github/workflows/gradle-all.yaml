@@ -29,7 +29,7 @@ on:
         type: string
         required: false
 jobs:
-  build-tag-publish-package:
+  setup:
     runs-on: ubuntu-22.04
     permissions:
       pull-requests: write
@@ -45,6 +45,10 @@ jobs:
       with:
         distribution: temurin
         java-version: ${{ inputs.java_version }}
+  build:
+    needs: setup
+    runs-on: ubuntu-22.04
+    steps:   
     - name: Execute Gradle 'build' task
       id: build
       uses: gradle/gradle-build-action@v2
@@ -55,6 +59,11 @@ jobs:
       with:
         gradle-version: ${{ inputs.gradle_version }}
         arguments: build -x test
+  sonarcube:
+    needs: build
+    if: inputs.sonarcloud_project_id
+    runs-on: ubuntu-22.04
+    steps:   
     - name: Execute Gradle 'sonarcube' task
       id: sonarqube
       uses: gradle/gradle-build-action@v2
@@ -69,6 +78,10 @@ jobs:
           -Dsonar.organization=mattilsynet
           -Dsonar.host.url=https://sonarcloud.io
           -Dsonar.projectKey=${{ inputs.sonarcloud_project_id }}
+  test:
+    needs: build
+    runs-on: ubuntu-22.04
+    steps: 
     - name: Execute Gradle 'test' task
       id: test
       uses: gradle/gradle-build-action@v2
@@ -88,6 +101,32 @@ jobs:
         name: Junit Tests
         path: build/test-results/test/TEST-*.xml
         reporter: java-junit
+  dependency-check:
+    needs: build
+    runs-on: ubuntu-22.04
+    steps:
+    - name: Depcheck
+      uses: dependency-check/Dependency-Check_Action@main
+      env: 
+        JAVA_HOME: /opt/jdk
+      id: Depcheck
+      with:
+        project: 'test'
+        path: '.'
+        format: 'HTML'
+        args: >
+          --failOnCVSS 7
+          --enableRetired
+    - name: Upload Test results
+      uses: actions/upload-artifact@master
+      with:
+          name: Depcheck report
+          path: ${{github.workspace}}/reports
+  publish:
+    needs: test
+    if: inputs.push_to_gb
+    runs-on: ubuntu-22.04
+    steps: 
     - name: Execute Gradle 'publish snapshot' task
       id: publish_snapshot
       if: ${{ inputs.push_to_gb &&  inputs.is_pr == true }}
@@ -103,7 +142,7 @@ jobs:
           publish
     - name: Bump version and push tag
       id: bump_version
-      if: ${{ inputs.push_to_gb && inputs.is_pr == false }}
+      if: ${{ inputs.is_pr == false }}
       uses: anothrNick/github-tag-action@v1
       env:
         DEFAULT_BUMP: minor
@@ -112,7 +151,7 @@ jobs:
         WITH_V: true
     - name: Execute Gradle 'publish' task
       id: publish
-      if: ${{ inputs.push_to_gb && inputs.is_pr == false }}
+      if: ${{ inputs.is_pr == false }}
       uses: gradle/gradle-build-action@v2
       env:
         GITHUB_ACTOR: ${{ secrets.GITHUB_ACTOR }}
