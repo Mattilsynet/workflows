@@ -56,7 +56,7 @@ jobs:
         gradle-version: ${{ inputs.gradle_version }}
         arguments: |
           build
-          --debug
+          --info
           -Dtest.reports.junitXml.enabled=true
           sonarqube
           -Dsonar.organization=mattilsynet
