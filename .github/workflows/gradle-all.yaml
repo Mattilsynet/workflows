@@ -30,7 +30,7 @@ on:
         required: false
 jobs:
   build-tag-publish-package:
-    runs-on: macos-latest
+    runs-on: ubuntu-22.04
     permissions:
       pull-requests: write
       checks: write
@@ -62,7 +62,7 @@ jobs:
           -Dsonar.organization=mattilsynet
           -Dsonar.host.url=https://sonarcloud.io
           -Dsonar.projectKey=${{ inputs.sonarcloud_project_id }}
-
+          -Dorg.gradle.jvmargs=-Xmx4g -XX:MaxPermSize=2048m -XX:+HeapDumpOnOutOfMemoryError
     - name: Test Report
       uses: dorny/test-reporter@v1.6.0
       if: success() || failure()
