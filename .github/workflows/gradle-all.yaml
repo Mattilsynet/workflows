@@ -56,13 +56,12 @@ jobs:
         gradle-version: ${{ inputs.gradle_version }}
         arguments: |
           build
-          --scan
           -Dtest.reports.junitXml.enabled=true
           sonarqube
           -Dsonar.organization=mattilsynet
           -Dsonar.host.url=https://sonarcloud.io
           -Dsonar.projectKey=${{ inputs.sonarcloud_project_id }}
-          -Dorg.gradle.jvmargs=-Xmx4g -XX:MaxPermSize=2048m -XX:+HeapDumpOnOutOfMemoryError
+          -Porg.gradle.jvmargs="-Xmx4g -XX:MaxPermSize=2048m -XX:+HeapDumpOnOutOfMemoryError"
     - name: Test Report
       uses: dorny/test-reporter@v1.6.0
       if: success() || failure()
