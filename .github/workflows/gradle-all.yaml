@@ -30,7 +30,7 @@ on:
         required: false
 jobs:
   build-tag-publish-package:
-    runs-on: ubuntu-20.04
+    runs-on: macos-latest
     permissions:
       pull-requests: write
       checks: write
