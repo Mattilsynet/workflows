@@ -46,7 +46,7 @@ jobs:
         distribution: temurin
         java-version: ${{ inputs.java_version }}
     - name: Execute Gradle 'build' task
-      id: test
+      id: build
       uses: gradle/gradle-build-action@v2
       env:
         GITHUB_ACTOR: ${{ secrets.GITHUB_ACTOR }}
@@ -56,7 +56,7 @@ jobs:
         gradle-version: ${{ inputs.gradle_version }}
         arguments: build -x test
     - name: Execute Gradle 'sonarcube' task
-      id: test
+      id: sonarqube
       uses: gradle/gradle-build-action@v2
       env:
         GITHUB_ACTOR: ${{ secrets.GITHUB_ACTOR }}
