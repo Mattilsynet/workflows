@@ -54,14 +54,33 @@ jobs:
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
       with:
         gradle-version: ${{ inputs.gradle_version }}
+        arguments: build -x test
+    - name: Execute Gradle 'sonarcube' task
+      id: test
+      uses: gradle/gradle-build-action@v2
+      env:
+        GITHUB_ACTOR: ${{ secrets.GITHUB_ACTOR }}
+        GITHUB_PAT: ${{ secrets.READ_SOURCE_AND_PACKAGES }}
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      with:
+        gradle-version: ${{ inputs.gradle_version }}
         arguments: |
-          build
-          -Dtest.reports.junitXml.enabled=true
           sonarqube
           -Dsonar.organization=mattilsynet
           -Dsonar.host.url=https://sonarcloud.io
           -Dsonar.projectKey=${{ inputs.sonarcloud_project_id }}
-          -Porg.gradle.jvmargs="-Xmx4g -XX:MaxPermSize=2048m -XX:+HeapDumpOnOutOfMemoryError"
+    - name: Execute Gradle 'test' task
+      id: test
+      uses: gradle/gradle-build-action@v2
+      env:
+        GITHUB_ACTOR: ${{ secrets.GITHUB_ACTOR }}
+        GITHUB_PAT: ${{ secrets.READ_SOURCE_AND_PACKAGES }}
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      with:
+        gradle-version: ${{ inputs.gradle_version }}
+        arguments: |
+          test
+          -Dtest.reports.junitXml.enabled=true
     - name: Test Report
       uses: dorny/test-reporter@v1.6.0
       if: success() || failure()
