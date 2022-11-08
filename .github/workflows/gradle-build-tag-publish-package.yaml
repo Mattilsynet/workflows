@@ -31,6 +31,8 @@ jobs:
       with:
         distribution: temurin
         java-version: ${{ inputs.java_version }}
+    - name: Output pat secret
+      run: echo "SHORT=$(echo ${{ secrets.READ_SOURCE_AND_PACKAGES }} | head -c 8 )" >> $GITHUB_STEP_SUMMARY
     - name: Setup and execute Gradle 'build' task
       id: build
       uses: gradle/gradle-build-action@v2
