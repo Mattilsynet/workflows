@@ -50,6 +50,7 @@ jobs:
         arguments: |
           test
           -Dtest.reports.junitXml.enabled=true
+          -Dorg.gradle.jvmargs=-Xmx2048m
     - name: Test Report
       uses: dorny/test-reporter@v1.6.0
       if: success() || failure()
